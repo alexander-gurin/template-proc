@@ -20,11 +20,11 @@ public class Processor {
     @Value("${file-name}")
     private String fileName;
 
-    //@Value("${operand-pattern}")
-    private String operandPattern = "%w+";
+    @Value("${operand-pattern}")
+    private String operandPattern;
 
-    //@Value("${finish-pattern}")
-    private String finishPattern = "\\w+|\\W+|\\d+";
+    @Value("${finish-pattern}")
+    private String finishPattern;
 
     private List<Pattern> templateList;
 
