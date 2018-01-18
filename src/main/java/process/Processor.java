@@ -9,10 +9,10 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Service
 public class Processor {
@@ -26,16 +26,21 @@ public class Processor {
     @Value("${finish-pattern}")
     private String finishPattern;
 
-    private List<Pattern> templateList;
+    //private List<Pattern> templateList;
 
-    public List<String> getTemplateByPhrase(String phrase) throws Exception {
-        if (!templateList.isEmpty()){
-            return templateList
-                         .stream()
-                         .filter(tmpl -> tmpl.matcher(phrase).matches())
-                         .map(Pattern::toString)
-                         .map(line -> line.replaceAll(finishPattern, operandPattern))
-                         .collect(Collectors.toList());
+    private Map<String, Pattern> templates = new HashMap<>();
+
+    public String getTemplateByPhrase(String phrase) throws Exception {
+        if (!templates.isEmpty()){
+            Map.Entry<String, Pattern> tmpl = templates.entrySet()
+                              .stream()
+                              .filter(e -> e.getValue().matcher(phrase).matches())
+                              .findFirst().orElse(null);
+            if(tmpl != null){
+                return tmpl.getKey();
+            }
+
+            return null;
         } else {
             throw new Exception("Template list is empty");
         }
@@ -45,11 +50,8 @@ public class Processor {
     private void readTemplateList() {
         try {
             Path path = Paths.get(Objects.requireNonNull(getClass().getClassLoader().getResource(fileName)).toURI());
-            templateList = Files
-                              .lines(path)
-                              .map(line -> line.replaceAll(operandPattern, finishPattern))
-                              .map(Pattern::compile)
-                              .collect(Collectors.toList());
+
+            Files.lines(path).forEach(l -> templates.put(l, Pattern.compile(l.replaceAll(operandPattern, finishPattern))));
 
             System.out.println("Templates was loaded with success!!!");
         } catch (URISyntaxException | IOException e) {
