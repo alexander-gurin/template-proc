@@ -26,21 +26,15 @@ public class Processor {
     @Value("${finish-pattern}")
     private String finishPattern;
 
-    //private List<Pattern> templateList;
-
     private Map<String, Pattern> templates = new HashMap<>();
 
     public String getTemplateByPhrase(String phrase) throws Exception {
         if (!templates.isEmpty()){
-            Map.Entry<String, Pattern> tmpl = templates.entrySet()
+            return templates.entrySet()
                               .stream()
                               .filter(e -> e.getValue().matcher(phrase).matches())
-                              .findFirst().orElse(null);
-            if(tmpl != null){
-                return tmpl.getKey();
-            }
+                              .findAny().orElse(null).getKey(); //Спасибо за напоминание Сергею из WhiteSky
 
-            return null;
         } else {
             throw new Exception("Template list is empty");
         }
