@@ -34,6 +34,7 @@ public class Processor {
                               .stream()
                               .filter(e -> e.getValue().matcher(phrase).matches())
                               .findAny().orElse(null).getKey(); //Спасибо за напоминание Сергею из WhiteSky
+
         } else {
             throw new Exception("Template list is empty");
         }
